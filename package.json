@@ -1,0 +1,25 @@
+{
+  "name": "MySQL-Storefront",
+  "version": "1.0.0",
+  "description": "",
+  "main": "customer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/b0bland/MySQL-Storefront.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/b0bland/MySQL-Storefront/issues"
+  },
+  "homepage": "https://github.com/b0bland/MySQL-Storefront#readme",
+  "dependencies": {
+    "cli-table2": "^0.2.0",
+    "inquirer": "^6.4.1",
+    "mysql": "^2.17.1"
+  }
+}
