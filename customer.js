@@ -17,17 +17,21 @@ connection.connect(function(err) {
     menu();
 });
 
-var table = new Table({
-    head: ['Item','Category','Price','Stock'],
-    colWidths: [20,20,15,10]
-});
 
 var items = [];
+var invent = [];
+
+
+
 
 var storefront = function() {
     connection.query("SELECT * FROM shop", function(err,res) {
         if (err) throw err;
         // console.log(res);
+        var table = new Table({
+            head: ['Item','Category','Price','Stock'],
+            colWidths: [20,20,15,10]
+        });
         for (n=0;n<res.length;n++) {
             var prod = res[n].product;
             var dep = res[n].department;
@@ -39,6 +43,7 @@ var storefront = function() {
             );
 
             items.push(prod);
+            invent.push(stock);
         };
         console.log(table.toString());
         shopQuery();
@@ -73,6 +78,49 @@ var shopQuery = function() {
             choices: items
         }
     ]).then(function(resp) {
-        console.log(resp.shop)
+        for (n=0;n<items.length;n++) {
+            if (resp.shop === items[n]) {
+                if (invent[n] > 0) {
+                    console.log("You have bought a(n)" + resp.shop);
+                    var num = invent[n] - 1;
+                    stockDecrement(num,resp.shop)
+                }
+                else if (invent[n] === 0) {
+                    console.log(resp.shop + " is out of stock.");
+                    shopQuery();
+                }
+            }
+        }
+
+    })
+}
+
+var stockDecrement = function(value,item) {
+    connection.query("UPDATE shop SET ? WHERE  ?", [
+        {
+            stock: value
+        },
+        {
+            product: item
+        }
+    ], function(err,res) {
+        if (err) throw err;
+        console.log("Stock logs updated!");
+        inquirer.prompt([
+            {
+                type: "list",
+                name: "again",
+                message: "Would you like to buy something else?",
+                choices: ["Yes","No"]
+            }
+        ]).then(function(resp) {
+            if (resp.again === "Yes") {
+                storefront();
+            }
+            else if (resp.again === "No") {
+                console.log("Have a nice day!");
+                connection.end();
+            }
+        })
     })
 }
