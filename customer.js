@@ -14,13 +14,15 @@ var connection = mysql.createConnection({
 connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
-    storefront();
-    connection.end();
+    menu();
 });
+
 var table = new Table({
     head: ['Item','Category','Price','Stock'],
     colWidths: [20,20,15,10]
 });
+
+var items = [];
 
 var storefront = function() {
     connection.query("SELECT * FROM shop", function(err,res) {
@@ -34,8 +36,43 @@ var storefront = function() {
 
             table.push(
                 [prod,dep,price,stock]
-            )
+            );
+
+            items.push(prod);
         };
         console.log(table.toString());
+        shopQuery();
+    })
+}
+
+var menu = function() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "menu",
+            message: "Welcome, would you like to purchase something?",
+            choices: ["Yes","No"]
+        }
+    ]).then(function(resp) {
+        if (resp.menu === "Yes") {
+            storefront();
+        }
+        else if (resp.menu === "No") {
+            console.log("Have a nice day!");
+            connection.end();
+        }
+    })
+}
+
+var shopQuery = function() {   
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "shop",
+            message: "What would you like to purchase?",
+            choices: items
+        }
+    ]).then(function(resp) {
+        console.log(resp.shop)
     })
 }
